@@ -1,1 +1,88 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f4f4;
+    color: #222;
+}
 
+.container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+    margin-top: 0;
+}
+
+p {
+    line-height: 1.5;
+}
+
+input[type="file"] {
+    display: block;
+    margin: 25px 0;
+}
+
+.configuracoes {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.configuracoes label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.configuracoes input {
+    width: 120px;
+    padding: 8px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+#mensagem {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#resultado {
+    margin-top: 30px;
+}
+
+#preview {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    overflow: auto;
+}
+
+#preview svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+}
