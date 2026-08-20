@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Conversor de SVG - Ubuntu Maker </title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <h1>Conversor de SVG</h1>
+
+        <p>
+            Selecione um arquivo SVG contendo dois paths.
+            O arquivo será convertido para dois contornos vermelhos,
+            posicionados verticalmente.
+        </p>
+
+        <input
+            type="file"
+            id="arquivoSvg"
+            accept=".svg,image/svg+xml"
+        >
+
+        <div class="configuracoes">
+
+            <label>
+                Distância entre os desenhos:
+                <input
+                    type="number"
+                    id="distancia"
+                    value="15"
+                    step="1"
+                >
+            </label>
+
+            <label>
+                Espessura da linha:
+                <input
+                    type="number"
+                    id="espessura"
+                    value="0.72"
+                    step="0.1"
+                >
+            </label>
+
+        </div>
+
+        <button id="converter">
+            Converter SVG
+        </button>
+
+        <p id="mensagem"></p>
+
+        <section id="resultado" hidden>
+
+            <h2>Resultado</h2>
+
+            <div id="preview"></div>
+
+            <button id="baixar">
+                Baixar SVG convertido
+            </button>
+
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
