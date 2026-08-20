@@ -1,5 +1,3 @@
-alert("script.js carregado!");
-
 const inputArquivo = document.getElementById("arquivoSvg");
 const inputDistancia = document.getElementById("distancia");
 const inputEspessura = document.getElementById("espessura");
