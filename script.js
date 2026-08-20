@@ -14,7 +14,7 @@ let nomeArquivoSaida = null;
 
 
 // --------------------------------------------------
-// Obtém transforms existentes no path e nos grupos
+// Obtém os transforms existentes no path e nos grupos
 // que o envolvem.
 // --------------------------------------------------
 
@@ -38,22 +38,50 @@ function obterTransformAcumulado(elemento, svgRaiz) {
 
 
 // --------------------------------------------------
-// Configura um path para ser somente contorno
+// Configura um path como somente contorno
 // --------------------------------------------------
 
 function configurarPath(path, cor, espessura) {
 
-    // Remove style porque ele pode sobrescrever
-    // fill, stroke etc.
     path.removeAttribute("style");
 
     path.setAttribute("fill", "none");
     path.setAttribute("stroke", cor);
     path.setAttribute("stroke-width", espessura);
 
-    // Garante que a linha permaneça visível
     path.setAttribute("stroke-linejoin", "round");
     path.setAttribute("stroke-linecap", "round");
+}
+
+
+// --------------------------------------------------
+// Cria uma cópia do path preservando sua posição
+// original no SVG
+// --------------------------------------------------
+
+function copiarPath(pathOriginal, svgOriginal) {
+
+    const copia = document.importNode(
+        pathOriginal,
+        true
+    );
+
+    const transform =
+        obterTransformAcumulado(
+            pathOriginal,
+            svgOriginal
+        );
+
+    copia.removeAttribute("transform");
+
+    if (transform) {
+        copia.setAttribute(
+            "transform",
+            transform
+        );
+    }
+
+    return copia;
 }
 
 
@@ -70,14 +98,15 @@ async function converterSvg() {
     const arquivo = inputArquivo.files[0];
 
     if (!arquivo) {
-        mensagem.textContent = "Selecione primeiro um arquivo SVG.";
+        mensagem.textContent =
+            "Selecione primeiro um arquivo SVG.";
         return;
     }
 
     try {
 
         // --------------------------------------------------
-        // Lê o arquivo
+        // Lê o SVG
         // --------------------------------------------------
 
         const texto = await arquivo.text();
@@ -94,34 +123,42 @@ async function converterSvg() {
         // Verifica erro de XML
         // --------------------------------------------------
 
-        const erroParser = documento.querySelector("parsererror");
+        const erroParser =
+            documento.querySelector("parsererror");
 
         if (erroParser) {
-            throw new Error("O arquivo SVG não pôde ser interpretado.");
+            throw new Error(
+                "O arquivo SVG não pôde ser interpretado."
+            );
         }
 
 
         // --------------------------------------------------
-        // SVG original
+        // Obtém SVG original
         // --------------------------------------------------
 
-        const svgOriginal = documento.documentElement;
+        const svgOriginal =
+            documento.documentElement;
 
         if (
             !svgOriginal ||
             svgOriginal.localName !== "svg"
         ) {
-            throw new Error("O arquivo selecionado não é um SVG válido.");
+            throw new Error(
+                "O arquivo selecionado não é um SVG válido."
+            );
         }
 
 
         // --------------------------------------------------
-        // Localiza os paths
+        // Encontra os dois paths
         // --------------------------------------------------
 
-        const paths = svgOriginal.querySelectorAll("path");
+        const paths =
+            svgOriginal.querySelectorAll("path");
 
         if (paths.length !== 2) {
+
             throw new Error(
                 `O SVG deve possuir exatamente 2 paths. ` +
                 `Foram encontrados ${paths.length}.`
@@ -133,7 +170,8 @@ async function converterSvg() {
         // Lê viewBox
         // --------------------------------------------------
 
-        const viewBox = svgOriginal.getAttribute("viewBox");
+        const viewBox =
+            svgOriginal.getAttribute("viewBox");
 
         if (!viewBox) {
             throw new Error(
@@ -151,7 +189,9 @@ async function converterSvg() {
             valores.length !== 4 ||
             valores.some(valor => Number.isNaN(valor))
         ) {
-            throw new Error("O viewBox do SVG é inválido.");
+            throw new Error(
+                "O viewBox do SVG é inválido."
+            );
         }
 
         const [
@@ -163,7 +203,7 @@ async function converterSvg() {
 
 
         // --------------------------------------------------
-        // Parâmetros escolhidos
+        // Parâmetros
         // --------------------------------------------------
 
         const distancia =
@@ -195,10 +235,11 @@ async function converterSvg() {
         const namespaceSvg =
             "http://www.w3.org/2000/svg";
 
-        const novoSvg = document.createElementNS(
-            namespaceSvg,
-            "svg"
-        );
+        const novoSvg =
+            document.createElementNS(
+                namespaceSvg,
+                "svg"
+            );
 
         const novaAltura =
             altura * 2 + distancia;
@@ -214,35 +255,35 @@ async function converterSvg() {
         );
 
 
-        // --------------------------------------------------
-        // PATH 1
-        // --------------------------------------------------
+        // ==================================================
+        // IMAGEM SUPERIOR
+        // ==================================================
 
-        const path1Original = paths[0];
+        const grupoSuperior =
+            document.createElementNS(
+                namespaceSvg,
+                "g"
+            );
 
-        const path1 = document.importNode(
-            path1Original,
-            true
+        grupoSuperior.setAttribute(
+            "id",
+            "imagem-superior"
         );
 
-        const transform1 =
-            obterTransformAcumulado(
-                path1Original,
+
+        // --------------------------------------------------
+        // PATH 1 - vermelho
+        // --------------------------------------------------
+
+        const path1 =
+            copiarPath(
+                paths[0],
                 svgOriginal
             );
 
-        path1.removeAttribute("transform");
-
-        if (transform1) {
-            path1.setAttribute(
-                "transform",
-                transform1
-            );
-        }
-
         path1.setAttribute(
             "id",
-            "path1"
+            "path1-vermelho"
         );
 
         configurarPath(
@@ -253,103 +294,113 @@ async function converterSvg() {
 
 
         // --------------------------------------------------
-        // PATH 2
+        // PATH 2 - azul
+        // Mantém exatamente a posição original
         // --------------------------------------------------
 
-        const path2Original = paths[1];
-
-        const path2 = document.importNode(
-            path2Original,
-            true
-        );
-
-        const transform2 =
-            obterTransformAcumulado(
-                path2Original,
+        const path2Azul =
+            copiarPath(
+                paths[1],
                 svgOriginal
             );
 
-        path2.removeAttribute("transform");
-
-        if (transform2) {
-            path2.setAttribute(
-                "transform",
-                transform2
-            );
-        }
-
-        path2.setAttribute(
+        path2Azul.setAttribute(
             "id",
-            "path2"
+            "path2-azul"
         );
 
         configurarPath(
-            path2,
+            path2Azul,
+            "#0000ff",
+            espessura
+        );
+
+
+        // Adiciona os dois à imagem superior
+
+        grupoSuperior.appendChild(path1);
+        grupoSuperior.appendChild(path2Azul);
+
+
+        // ==================================================
+        // IMAGEM INFERIOR
+        // ==================================================
+
+        const grupoInferior =
+            document.createElementNS(
+                namespaceSvg,
+                "g"
+            );
+
+        grupoInferior.setAttribute(
+            "id",
+            "imagem-inferior"
+        );
+
+
+        // --------------------------------------------------
+        // PATH 2 - vermelho
+        // --------------------------------------------------
+
+        const path2Vermelho =
+            copiarPath(
+                paths[1],
+                svgOriginal
+            );
+
+        path2Vermelho.setAttribute(
+            "id",
+            "path2-vermelho"
+        );
+
+        configurarPath(
+            path2Vermelho,
             "#ff0000",
             espessura
         );
 
 
         // --------------------------------------------------
-        // Grupo do primeiro desenho
+        // Move a imagem inferior para baixo
         // --------------------------------------------------
-
-        const grupo1 = document.createElementNS(
-            namespaceSvg,
-            "g"
-        );
-
-        grupo1.setAttribute(
-            "id",
-            "desenho1"
-        );
-
-        grupo1.appendChild(path1);
-
-
-        // --------------------------------------------------
-        // Grupo do segundo desenho
-        // deslocado verticalmente
-        // --------------------------------------------------
-
-        const grupo2 = document.createElementNS(
-            namespaceSvg,
-            "g"
-        );
-
-        grupo2.setAttribute(
-            "id",
-            "desenho2"
-        );
 
         const deslocamentoY =
             altura + distancia;
 
-        grupo2.setAttribute(
+        grupoInferior.setAttribute(
             "transform",
             `translate(0 ${deslocamentoY})`
         );
 
-        grupo2.appendChild(path2);
+        grupoInferior.appendChild(
+            path2Vermelho
+        );
+
+
+        // ==================================================
+        // Monta SVG final
+        // ==================================================
+
+        novoSvg.appendChild(
+            grupoSuperior
+        );
+
+        novoSvg.appendChild(
+            grupoInferior
+        );
 
 
         // --------------------------------------------------
-        // Adiciona ao SVG
-        // --------------------------------------------------
-
-        novoSvg.appendChild(grupo1);
-        novoSvg.appendChild(grupo2);
-
-
-        // --------------------------------------------------
-        // Converte novamente para texto
+        // Serializa SVG
         // --------------------------------------------------
 
         const serializer =
             new XMLSerializer();
 
         const conteudoSvg =
-            serializer.serializeToString(novoSvg);
+            serializer.serializeToString(
+                novoSvg
+            );
 
         svgConvertido =
             '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -357,11 +408,14 @@ async function converterSvg() {
 
 
         // --------------------------------------------------
-        // Nome automático do arquivo
+        // Nome do arquivo
         // --------------------------------------------------
 
         const nomeOriginal =
-            arquivo.name.replace(/\.svg$/i, "");
+            arquivo.name.replace(
+                /\.svg$/i,
+                ""
+            );
 
         nomeArquivoSaida =
             `${nomeOriginal}_convertido.svg`;
@@ -403,12 +457,14 @@ function baixarSvg() {
         return;
     }
 
-    const blob = new Blob(
-        [svgConvertido],
-        {
-            type: "image/svg+xml;charset=utf-8"
-        }
-    );
+    const blob =
+        new Blob(
+            [svgConvertido],
+            {
+                type:
+                    "image/svg+xml;charset=utf-8"
+            }
+        );
 
     const url =
         URL.createObjectURL(blob);
